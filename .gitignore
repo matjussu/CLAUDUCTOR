@@ -1,0 +1,6 @@
+node_modules/
+.conductor/state.json
+.conductor/logs/
+.conductor/worktrees/
+*.log
+.DS_Store

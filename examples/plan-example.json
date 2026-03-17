@@ -1,0 +1,59 @@
+{
+  "project": "my-webapp",
+  "created_at": "2026-03-17T10:00:00.000Z",
+  "description": "Build auth system, user CRUD, and tests for the Express API",
+  "tasks": [
+    {
+      "id": "task-1",
+      "name": "JWT Authentication",
+      "prompt": "Implement JWT authentication for this Express.js API.\n\nProject structure: src/routes/, src/middleware/, src/models/ (Prisma ORM with PostgreSQL).\n\nRequirements:\n1. Create src/middleware/auth.js with verifyToken middleware\n2. Create src/routes/auth.js with POST /login and POST /register endpoints\n3. Use bcrypt for password hashing, jsonwebtoken for tokens\n4. Add refresh token rotation (store in httpOnly cookies)\n5. Add rate limiting on auth endpoints (express-rate-limit)\n\nConventions: Use async/await, Prisma for DB, Zod for validation.\nSuccess criteria: All auth routes return proper status codes, tokens are signed and verified correctly.",
+      "model": "sonnet",
+      "permission_mode": "acceptEdits",
+      "max_turns": 20,
+      "max_budget_usd": 4.0,
+      "dependencies": [],
+      "worktree": true,
+      "system_prompt_append": "This project uses Express 5, Prisma 6, and TypeScript. Follow existing patterns in src/routes/health.ts for route structure.",
+      "rationale": "Sonnet handles auth implementation well. 20 turns for multi-file creation (middleware, routes, model updates, env config). No dependencies — can start immediately."
+    },
+    {
+      "id": "task-2",
+      "name": "User CRUD API",
+      "prompt": "Create a complete CRUD API for users in this Express.js project.\n\nProject structure: src/routes/, src/models/ (Prisma with PostgreSQL).\n\nRequirements:\n1. Create src/routes/users.ts with GET /users, GET /users/:id, PUT /users/:id, DELETE /users/:id\n2. Add pagination on GET /users (query params: page, limit, sort)\n3. Add input validation with Zod schemas\n4. Add proper error handling with consistent error response format\n5. Users should NOT be able to update their own role\n\nConventions: async/await, Prisma for DB, Zod for validation.\nDo NOT implement authentication — it will be added separately.\nSuccess criteria: All endpoints return correct status codes, pagination works, validation rejects bad input.",
+      "model": "sonnet",
+      "permission_mode": "acceptEdits",
+      "max_turns": 15,
+      "max_budget_usd": 3.0,
+      "dependencies": [],
+      "worktree": true,
+      "system_prompt_append": "",
+      "rationale": "Sonnet for standard CRUD. Independent from auth — no dependency needed. 15 turns sufficient for routes + validation."
+    },
+    {
+      "id": "task-3",
+      "name": "Integration Tests",
+      "prompt": "Write integration tests for the auth and user CRUD endpoints of this Express.js API.\n\nProject structure: src/routes/auth.ts, src/routes/users.ts, tests/\n\nRequirements:\n1. Use Vitest + Supertest\n2. Create tests/setup.ts with test database setup (use Prisma with a test database URL)\n3. Create tests/auth.test.ts testing: register, login, refresh token, invalid credentials\n4. Create tests/users.test.ts testing: CRUD operations, pagination, validation errors, unauthorized access\n5. Each test should be independent (clean DB between tests)\n\nConventions: Describe/it blocks, meaningful test names.\nSuccess criteria: npm test passes with >80% coverage on auth and user routes.",
+      "model": "sonnet",
+      "permission_mode": "acceptEdits",
+      "max_turns": 20,
+      "max_budget_usd": 4.0,
+      "dependencies": ["task-1", "task-2"],
+      "worktree": true,
+      "system_prompt_append": "",
+      "rationale": "Tests depend on both auth and CRUD being implemented first. Sonnet handles test writing well. 20 turns because test setup + multiple test files."
+    },
+    {
+      "id": "task-4",
+      "name": "API Documentation Review",
+      "prompt": "Review this Express.js API codebase and generate a comprehensive API documentation summary.\n\nAnalyze:\n1. All route files in src/routes/\n2. All middleware in src/middleware/\n3. Prisma schema in prisma/schema.prisma\n4. Environment variables used\n\nOutput a markdown document (docs/API.md) with:\n- Endpoint list with methods, paths, request/response examples\n- Authentication flow description\n- Error response format\n- Environment variables needed\n- Setup instructions",
+      "model": "haiku",
+      "permission_mode": "acceptEdits",
+      "max_turns": 10,
+      "max_budget_usd": 1.0,
+      "dependencies": ["task-1", "task-2"],
+      "worktree": true,
+      "system_prompt_append": "",
+      "rationale": "Doc generation from existing code — Haiku is sufficient and fast. Depends on auth + CRUD being done. 10 turns is plenty for reading + writing one markdown file."
+    }
+  ]
+}

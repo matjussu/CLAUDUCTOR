@@ -1,0 +1,46 @@
+{
+  "project": "claude-conductor",
+  "created_at": "2026-03-17T00:00:00.000Z",
+  "description": "Amélioration du README, audit complet du projet, et génération du CLAUDE.md optimal",
+  "tasks": [
+    {
+      "id": "task-1",
+      "name": "Amélioration README",
+      "prompt": "Tu travailles sur le projet claude-conductor, un CLI Node.js (ESM) qui orchestre plusieurs instances Claude Code en parallèle à partir d'une todo list.\n\nFichiers clés du projet :\n- bin/conductor.js : point d'entrée CLI (commandes: plan, run, status, logs, stop)\n- src/schema.js : constantes, types JSDoc, validatePlan()\n- src/planner.js : génère le plan via Claude Code headless, computeParallelGroups()\n- src/runner.js : exécute les tâches, gère retry/worktrees\n- src/monitor.js : status et logs\n- src/worktree.js : isolation git worktree par tâche\n- skill/orchestrate.md : skill Claude Code /orchestrate\n- examples/plan-example.json : exemple de plan complet\n- package.json : Node >=18, type: module, dépendances: chalk, commander, ora, tree-kill\n\nTa mission : Lire le README.md actuel et l'améliorer pour qu'il soit TRÈS clair.\n\nCritères :\n1. La section 'How It Works' doit expliquer clairement les deux chemins : via /orchestrate (skill) ET via conductor CLI directement\n2. La section Installation doit mentionner les deux étapes : npm install -g claude-conductor ET copier le skill\n3. Ajouter une section 'Quick Start' concise en haut (avant 'The Problem') avec le minimum pour démarrer\n4. S'assurer que le diagramme ASCII est clair et précis par rapport au code réel\n5. Vérifier que toutes les commandes CLI documentées correspondent exactement à ce que bin/conductor.js implémente\n6. La section Configuration doit documenter .conductor/config.json avec les valeurs par défaut tirées de src/schema.js (max_parallel: 4, default_model: sonnet, max_retries: 2, default_budget_usd: 5.0)\n7. Le README doit être en anglais, clair, bien structuré, et donner envie d'utiliser le projet\n\nModifie uniquement README.md. Ne crée pas d'autres fichiers.",
+      "model": "sonnet",
+      "permission_mode": "acceptEdits",
+      "max_turns": 12,
+      "max_budget_usd": 2.0,
+      "dependencies": [],
+      "worktree": false,
+      "system_prompt_append": "Lis d'abord tous les fichiers source pour comprendre exactement ce que le projet fait avant d'écrire quoi que ce soit.",
+      "rationale": "Sonnet pour rédaction de documentation. Tâche indépendante, peut commencer immédiatement. worktree: false car la tâche ne modifie qu'un fichier et le projet n'est pas un git repo."
+    },
+    {
+      "id": "task-2",
+      "name": "Audit complet du projet",
+      "prompt": "Tu travailles sur le projet claude-conductor, un CLI Node.js (ESM) qui orchestre plusieurs instances Claude Code en parallèle.\n\nStructure du projet :\n- bin/conductor.js : CLI (plan, run, status, logs, stop)\n- src/schema.js : CONDUCTOR_DIR, PLAN_FILE, STATE_FILE, LOGS_DIR, MODELS, PERMISSION_MODES, DEFAULTS, MODEL_UPGRADE_PATH, validatePlan()\n- src/planner.js : buildMetaPrompt(), generatePlanWithClaude(), applyDefaults(), displayPlan(), computeParallelGroups(), plan()\n- src/runner.js : buildClaudeArgs(), runTask(), shouldRetry(), run(), stop()\n- src/monitor.js : status(), logs()\n- src/worktree.js : isGitRepo(), getCurrentBranch(), createWorktree(), removeWorktree(), mergeWorktree(), cleanupAllWorktrees()\n- skill/orchestrate.md : skill Claude Code /orchestrate\n- examples/plan-example.json : exemple de plan\n- package.json : scripts.test pointe vers src/__tests__/ (dossier inexistant)\n\nTa mission : Auditer TOUS les fichiers du projet et identifier les problèmes.\n\nPour chaque fichier, vérifie :\n1. **Bugs** : logique incorrecte, edge cases non gérés, erreurs potentielles\n2. **Incohérences** : PERMISSION_MODES inclut 'execute' dans schema.js mais runner.js ne le gère pas ; cleanupAllWorktrees() dans worktree.js n'est jamais appelée\n3. **Fichiers manquants** : src/__tests__/ référencé dans package.json mais absent\n4. **Conventions** : ESM imports/exports, gestion d'erreurs, cohérence de style\n5. **Sécurité** : injection de commandes, gestion des chemins\n6. **plan.json schema** : vérifier que skill/orchestrate.md et src/schema.js sont synchronisés\n\nOutput : Écris un fichier .conductor/audit-report.md avec :\n- Liste de tous les problèmes trouvés (classés par sévérité: HIGH/MEDIUM/LOW)\n- Pour chaque problème: fichier:ligne, description, suggestion de fix\n- Section 'Summary' avec le bilan global\n\nSois exhaustif. Lis CHAQUE fichier source avant de conclure.",
+      "model": "sonnet",
+      "permission_mode": "acceptEdits",
+      "max_turns": 15,
+      "max_budget_usd": 2.5,
+      "dependencies": [],
+      "worktree": false,
+      "system_prompt_append": "Sois méthodique : lis chaque fichier intégralement avant de rédiger le rapport.",
+      "rationale": "Sonnet pour l'audit de code. Tâche indépendante. Crée un rapport d'audit plutôt que de modifier le code (permission_mode acceptEdits pour écrire le rapport). worktree: false car pas de git repo."
+    },
+    {
+      "id": "task-3",
+      "name": "Génération CLAUDE.md optimal",
+      "prompt": "Tu travailles sur le projet claude-conductor, un CLI Node.js (ESM) qui orchestre plusieurs instances Claude Code en parallèle à partir d'une todo list.\n\nContexte du projet :\n- bin/conductor.js : CLI avec commandes plan, run, status, logs, stop\n- src/schema.js : constants (CONDUCTOR_DIR='.conductor', PLAN_FILE, STATE_FILE, LOGS_DIR), MODELS=['haiku','sonnet','opus'], PERMISSION_MODES=['plan','execute','acceptEdits'], DEFAULTS={max_turns:15, max_budget_usd:5.0, max_retries:2, max_parallel:4}, validatePlan()\n- src/planner.js : meta-prompt en français pour Claude, generatePlanWithClaude() appelle 'claude -p' avec --output-format json, computeParallelGroups() pour les waves d'exécution\n- src/runner.js : buildClaudeArgs() construit les args claude, runTask() spawn claude avec stdio pipe, shouldRetry() upgrade haiku→sonnet→opus, run() exécute par waves avec gestion worktrees\n- src/monitor.js : status() avec option --watch (setInterval 2s), logs() avec option --follow (tail -f)\n- src/worktree.js : git worktree isolation par task, mergeWorktree() fait git merge --no-edit avec abort si conflit\n- skill/orchestrate.md : skill /orchestrate pour Claude Code (steps: analyse → décompose → génère plan.json → valide → execute)\n- package.json : name='claude-conductor', version='0.1.0', type='module', bin.conductor='./bin/conductor.js', engines.node='>=18'\n- Pas de CLAUDE.md actuellement\n- Pas de tests (src/__tests__/ n'existe pas)\n- Pas de TypeScript (JS natif ESM)\n\nTa mission : Créer un fichier CLAUDE.md optimal à la racine du projet.\n\nLe CLAUDE.md doit contenir :\n1. **Architecture** : rôle de chaque fichier, flux d'exécution (plan → run → monitor)\n2. **Conventions** : ESM imports, fonctions exportées, style de code JS\n3. **Points critiques** : le meta-prompt dans planner.js est en français, le plan.json est le contrat central, worktree isolation nécessite git\n4. **Commands** : comment tester, comment installer globalement\n5. **Pièges courants** : edge cases connus (pas git repo = mode séquentiel, --dangerously-skip-permissions pour acceptEdits, permission_mode 'execute' dans schema mais non géré dans runner)\n6. **Schema plan.json** : documentation concise des champs requis\n\nLis TOUS les fichiers source avant d'écrire le CLAUDE.md. Le résultat doit être un guide parfait pour que tout développeur (ou instance Claude Code) puisse contribuer efficacement dès la première lecture.\n\nCrée uniquement CLAUDE.md à la racine /home/matteo_linux/projets/conductor/CLAUDE.md.",
+      "model": "sonnet",
+      "permission_mode": "acceptEdits",
+      "max_turns": 15,
+      "max_budget_usd": 2.5,
+      "dependencies": [],
+      "worktree": false,
+      "system_prompt_append": "Lis chaque fichier source intégralement. Le CLAUDE.md doit être précis, dense en information utile, et pas plus long que nécessaire.",
+      "rationale": "Sonnet pour générer de la documentation technique. Tâche indépendante (lira le code elle-même). worktree: false car pas de git repo."
+    }
+  ]
+}
